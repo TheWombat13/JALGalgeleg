@@ -18,6 +18,7 @@ public class Galgelogik {
   private boolean sidsteBogstavVarKorrekt;
   private boolean spilletErVundet;
   private boolean spilletErTabt;
+  private int wintime;
 
 
   public ArrayList<String> getBrugteBogstaver() {
@@ -50,6 +51,10 @@ public class Galgelogik {
 
   public boolean erSpilletSlut() {
     return spilletErTabt || spilletErVundet;
+  }
+
+  public int getWintime() {
+    return wintime;
   }
 
 
@@ -138,6 +143,8 @@ public class Galgelogik {
     }
     return sb.toString();
   }
+
+
 
 
   public void hentOrdFraDr() throws Exception {

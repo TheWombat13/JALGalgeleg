@@ -1,8 +1,10 @@
 package com.example.jonathanlarsen.jalgalgeleg;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,18 +16,33 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import java.sql.Time;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.os.Bundle;
+import android.app.Activity;
+
+
 
 public class Game_Fragment extends Fragment implements View.OnClickListener {
 
+    Bundle args = new Bundle();
+    Timer time = new Timer();
     Galgelogik logik = new Galgelogik();
-    private TextView info;
+    private TextView info, timeview;
     private Button playbutton;
     private EditText editText;
     private ImageView image;
+    public int seconds;
+    public int minutes;
+
+
 
     @Override
     public View onCreateView(LayoutInflater i, ViewGroup container, Bundle savedInstanceState) {
         View rod = i.inflate(R.layout.fragment_game, container, false);
+
 
 
         playbutton = (Button)rod.findViewById(R.id.play);
@@ -33,48 +50,19 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
 
         info = (TextView)rod.findViewById(R.id.info);
 
+        timeview = (TextView)rod.findViewById(R.id.timer);
+
         editText = (EditText)rod.findViewById(R.id.editText);
         editText.requestFocus();
 
         image = (ImageView)rod.findViewById(R.id.hanging);
 
-
+        timecounter();
 
         return rod;
     }
 
-    /*
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("Velkomst_frag", "fragmentet blev vist!");
 
-        // Programmatisk layout
-
-        TableLayout tl = new TableLayout(getActivity());
-
-        info = new TextView(getActivity());
-        info.setText("Velkommen til mit fantastiske spil." +
-                "\nDu skal gætte dette ord: "+logik.getSynligtOrd() +
-                "\nSkriv et bogstav herunder og tryk 'Spil'.\n");
-        String velkomst = getArguments().getString("velkomst");
-        if (velkomst!=null) info.append(velkomst);
-        tl.addView(info);
-
-        et = new EditText(getActivity());
-        et.setHint("Skriv et bogstav her.");
-        tl.addView(et);
-
-        spilKnap = new Button(getActivity());
-        spilKnap.setText("Spil");
-        spilKnap.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_play, 0, 0, 0);
-        tl.addView(spilKnap);
-
-        spilKnap.setOnClickListener(this);
-
-        return tl;
-    }
-
-    */
 
     @Override
     public void onClick(View view) {
@@ -89,6 +77,44 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
         opdaterSkærm();
     }
 
+    private void timecounter() {
+        //Set the schedule function and rate
+        time.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        timeview.setText(String.valueOf(minutes)+":"+String.valueOf(seconds));
+
+                        seconds += 1;
+                        if(seconds == 0)
+
+                        {
+                            timeview.setText(String.valueOf(minutes)+":"+String.valueOf(seconds));
+                            seconds=60;
+                            minutes=minutes+1;
+                        }
+                    }
+                });
+            }
+        }, 0, 1000);
+    }
+
+
+
+
+    public void stopRecording() {
+        if (time != null) {
+            time.cancel();
+            time.purge();
+            time = null;
+        } else {
+            Log.e("TRACK_RECORDING_SERVICE","Timer already null.");
+        }
+    }
 
     private void opdaterSkærm() {
         info.setText("Gæt ordet: " + logik.getSynligtOrd());
@@ -115,9 +141,25 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
 
         if (logik.erSpilletVundet()) {
 
-            info.append("\nDu har vundet");
+            SharedPreferences preferences = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = preferences.edit();
+            prefsEditor.putInt("seconds", seconds).apply();
+            boolean savedOrNot = prefsEditor.commit();
+
+            if(savedOrNot){
+                System.out.println("saved");
+            }else{
+                System.out.println("Notsaved");
+            }
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragPlaceholder, new Win_Fragment())
+                    .addToBackStack(null)
+                    .commit();
+            stopRecording();
+
         }
         if (logik.erSpilletTabt()) {
+            stopRecording();
             getFragmentManager().beginTransaction()
                     .replace(R.id.fragPlaceholder, new Lose_Fragment())
                     .addToBackStack(null)
@@ -125,3 +167,4 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
         }
     }
 }
+
