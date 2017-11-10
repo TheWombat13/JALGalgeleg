@@ -27,7 +27,6 @@ import android.app.Activity;
 
 public class Game_Fragment extends Fragment implements View.OnClickListener {
 
-    Bundle args = new Bundle();
     Timer time = new Timer();
     Galgelogik logik = new Galgelogik();
     private TextView info, timeview;
@@ -90,11 +89,11 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
                         timeview.setText(String.valueOf(minutes)+":"+String.valueOf(seconds));
 
                         seconds += 1;
-                        if(seconds == 0)
+                        if(seconds == 59)
 
                         {
                             timeview.setText(String.valueOf(minutes)+":"+String.valueOf(seconds));
-                            seconds=60;
+                            seconds=0;
                             minutes=minutes+1;
                         }
                     }
@@ -102,6 +101,29 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
             }
         }, 0, 1000);
     }
+
+
+    public void SaveTimer(String key, int value) {
+        SharedPreferences preferences = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        prefsEditor.putInt(key, seconds).apply();
+        prefsEditor.putInt(key, minutes).apply();
+        boolean savedOrNot = prefsEditor.commit();
+
+        if(savedOrNot){
+            System.out.println("saved"+minutes+":"+seconds);
+        }else{
+            System.out.println("Notsaved");
+        }
+    }
+
+    public void LoadTimer() {
+        SharedPreferences pref = this.getActivity().getPreferences(Context.MODE_PRIVATE);
+        int idseconds = pref.getInt("seconds", seconds);
+        int idminutes = pref.getInt("minutes", minutes);
+        info.setText(idminutes+":"+idseconds);
+    }
+
 
 
 
@@ -141,21 +163,14 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
 
         if (logik.erSpilletVundet()) {
 
-            SharedPreferences preferences = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-            SharedPreferences.Editor prefsEditor = preferences.edit();
-            prefsEditor.putInt("seconds", seconds).apply();
-            boolean savedOrNot = prefsEditor.commit();
 
-            if(savedOrNot){
-                System.out.println("saved");
-            }else{
-                System.out.println("Notsaved");
-            }
-            getFragmentManager().beginTransaction()
+            SaveTimer("seconds",seconds);
+
+           getFragmentManager().beginTransaction()
                     .replace(R.id.fragPlaceholder, new Win_Fragment())
                     .addToBackStack(null)
                     .commit();
-            stopRecording();
+           stopRecording();
 
         }
         if (logik.erSpilletTabt()) {
