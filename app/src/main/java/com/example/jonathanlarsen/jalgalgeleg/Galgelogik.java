@@ -60,7 +60,7 @@ public class Galgelogik {
 
   public Galgelogik() {
     muligeOrd.add("bil");
-    muligeOrd.add("computer");
+/*    muligeOrd.add("computer");
     muligeOrd.add("programmering");
     muligeOrd.add("motorvej");
     muligeOrd.add("busrute");
@@ -69,7 +69,7 @@ public class Galgelogik {
     muligeOrd.add("solsort");
     muligeOrd.add("seksten");
     muligeOrd.add("sytten");
-    nulstil();
+ */   nulstil();
   }
 
   public void nulstil() {

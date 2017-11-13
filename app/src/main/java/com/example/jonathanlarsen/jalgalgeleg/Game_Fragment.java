@@ -2,7 +2,6 @@ package com.example.jonathanlarsen.jalgalgeleg;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -13,36 +12,30 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TableLayout;
 import android.widget.TextView;
-
-import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.os.Bundle;
-import android.app.Activity;
 
 
 
 public class Game_Fragment extends Fragment implements View.OnClickListener {
 
     Timer time = new Timer();
-    Galgelogik logik = new Galgelogik();
     private TextView info, timeview;
     private Button playbutton;
     private EditText editText;
     private ImageView image;
     public int seconds;
     public int minutes;
-
+    ArrayList<String> highscoreList;
 
 
     @Override
     public View onCreateView(LayoutInflater i, ViewGroup container, Bundle savedInstanceState) {
         View rod = i.inflate(R.layout.fragment_game, container, false);
 
-
+        highscoreList = new ArrayList<>();
 
         playbutton = (Button)rod.findViewById(R.id.play);
         playbutton.setOnClickListener(this);
@@ -55,6 +48,8 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
         editText.requestFocus();
 
         image = (ImageView)rod.findViewById(R.id.hanging);
+
+
 
         timecounter();
 
@@ -70,7 +65,7 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
             editText.setError("Skriv præcis ét bogstav");
             return;
         }
-        logik.gætBogstav(bogstav);
+        MenuActivity.logik.gætBogstav(bogstav);
         editText.setText("");
         editText.setError(null);
         opdaterSkærm();
@@ -102,32 +97,6 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
         }, 0, 1000);
     }
 
-
-    public void SaveTimer(String key, int value) {
-        SharedPreferences preferences = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor prefsEditor = preferences.edit();
-        prefsEditor.putInt(key, seconds).apply();
-        prefsEditor.putInt(key, minutes).apply();
-        boolean savedOrNot = prefsEditor.commit();
-
-        if(savedOrNot){
-            System.out.println("saved"+minutes+":"+seconds);
-        }else{
-            System.out.println("Notsaved");
-        }
-    }
-
-    public void LoadTimer() {
-        SharedPreferences pref = this.getActivity().getPreferences(Context.MODE_PRIVATE);
-        int idseconds = pref.getInt("seconds", seconds);
-        int idminutes = pref.getInt("minutes", minutes);
-        info.setText(idminutes+":"+idseconds);
-    }
-
-
-
-
-
     public void stopRecording() {
         if (time != null) {
             time.cancel();
@@ -139,32 +108,40 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
     }
 
     private void opdaterSkærm() {
-        info.setText("Gæt ordet: " + logik.getSynligtOrd());
-        info.append("\n\nDu har " + logik.getAntalForkerteBogstaver() + " forkerte:" + logik.getBrugteBogstaver());
+        info.setText("Gæt ordet: " + MenuActivity.logik.getSynligtOrd());
+        info.append("\n\nDu har " + MenuActivity.logik.getAntalForkerteBogstaver() + " forkerte:" + MenuActivity.logik.getBrugteBogstaver());
 
-        if (logik.getAntalForkerteBogstaver() == 1) {
+        if (MenuActivity.logik.getAntalForkerteBogstaver() == 1) {
             image.setImageResource(R.drawable.forkert1);
         }
-        if (logik.getAntalForkerteBogstaver() == 2) {
+        if (MenuActivity.logik.getAntalForkerteBogstaver() == 2) {
             image.setImageResource(R.drawable.forkert2);
         }
-        if (logik.getAntalForkerteBogstaver() == 3) {
+        if (MenuActivity.logik.getAntalForkerteBogstaver() == 3) {
             image.setImageResource(R.drawable.forkert3);
         }
-        if (logik.getAntalForkerteBogstaver() == 4) {
+        if (MenuActivity.logik.getAntalForkerteBogstaver() == 4) {
             image.setImageResource(R.drawable.forkert4);
         }
-        if (logik.getAntalForkerteBogstaver() == 5) {
+        if (MenuActivity.logik.getAntalForkerteBogstaver() == 5) {
             image.setImageResource(R.drawable.forkert5);
         }
-        if (logik.getAntalForkerteBogstaver() == 6) {
+        if (MenuActivity.logik.getAntalForkerteBogstaver() == 6) {
             image.setImageResource(R.drawable.forkert6);
         }
 
-        if (logik.erSpilletVundet()) {
+        if (MenuActivity.logik.erSpilletVundet()) {
 
+            getArray();
+            String wintime = minutes+":"+seconds;
+            highscoreList.add(wintime);
+            System.out.println("burde printe" + highscoreList.get(0));
 
-            SaveTimer("seconds",seconds);
+            updateHighscore();
+
+            SharedPreferences preferences = this.getActivity().getSharedPreferences(MenuActivity.PREF_FILE_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = preferences.edit();
+            prefsEditor.putString("wintime", wintime).apply();
 
            getFragmentManager().beginTransaction()
                     .replace(R.id.fragPlaceholder, new Win_Fragment())
@@ -173,13 +150,43 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
            stopRecording();
 
         }
-        if (logik.erSpilletTabt()) {
+        if (MenuActivity.logik.erSpilletTabt()) {
             stopRecording();
             getFragmentManager().beginTransaction()
                     .replace(R.id.fragPlaceholder, new Lose_Fragment())
                     .addToBackStack(null)
                     .commit();
         }
+
+
+
+
+        }
+
+        public void updateHighscore() {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences.Editor prefsEditor = preferences.edit();
+            prefsEditor.putInt("highscore_size", highscoreList.size());
+
+            for (int i=0; i<highscoreList.size(); i++) {
+                prefsEditor.remove("highscore_"+ i);
+                prefsEditor.putString("highscore_"+i, highscoreList.get(i));
+
+            }
+
+            prefsEditor.apply();
+            //reset sharedPreferences
+            //prefsEditor.clear().commit();
     }
+
+        public void getArray() {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            highscoreList.clear();
+            int highscoreSize = sharedPreferences.getInt("highscore_size", 0);
+
+            for (int i = 0; i < highscoreSize; i++) {
+                highscoreList.add(sharedPreferences.getString("highscore_" + i, null));
+            }
+        }
 }
 

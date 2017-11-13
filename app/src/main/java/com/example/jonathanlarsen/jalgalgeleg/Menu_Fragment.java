@@ -12,7 +12,7 @@ import android.widget.Button;
 
 public class Menu_Fragment extends Fragment implements View.OnClickListener {
 
-    Button gamebutton, settingsbutton, helpbutton;
+    Button gamebutton, settingsbutton, helpbutton, highscorebutton;
 
 
 
@@ -28,6 +28,9 @@ public class Menu_Fragment extends Fragment implements View.OnClickListener {
 
         helpbutton = (Button)rod.findViewById(R.id.help);
         helpbutton.setOnClickListener(this);
+
+        highscorebutton = (Button)rod.findViewById(R.id.highscore);
+        highscorebutton.setOnClickListener(this);
 
         return rod;
     }
@@ -57,6 +60,13 @@ public class Menu_Fragment extends Fragment implements View.OnClickListener {
         else if (v == helpbutton) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.fragPlaceholder, new Help_Fragment())
+                    .addToBackStack(null)
+                    .commit();
+        }
+
+        else if (v == highscorebutton) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragPlaceholder, new HighScore_Fragment())
                     .addToBackStack(null)
                     .commit();
         }

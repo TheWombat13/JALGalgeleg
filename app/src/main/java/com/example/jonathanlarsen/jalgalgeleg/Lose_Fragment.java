@@ -8,12 +8,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Timer;
-
 
 public class Lose_Fragment extends Fragment implements View.OnClickListener{
 
-    Galgelogik logik = new Galgelogik();
     private TextView info;
     private Button cancel, tryagain;
 
@@ -30,7 +27,7 @@ public class Lose_Fragment extends Fragment implements View.OnClickListener{
         tryagain.setOnClickListener(this);
 
 
-        info.setText("Du har tabt, ordet var : " + logik.getOrdet());
+        info.setText("Du har tabt, ordet var : " + MenuActivity.logik.getOrdet());
         return rod;
     }
 

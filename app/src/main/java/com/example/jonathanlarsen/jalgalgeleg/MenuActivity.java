@@ -1,5 +1,6 @@
 package com.example.jonathanlarsen.jalgalgeleg;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -13,12 +14,17 @@ import java.util.Timer;
 public class MenuActivity extends AppCompatActivity{
 
 
+    public static final String PREF_FILE_NAME = "PrefFile";
+
+    public static Galgelogik logik = new Galgelogik();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_frag);
+
 
         if (savedInstanceState == null) {
             Fragment fragment = new Menu_Fragment();
@@ -28,8 +34,6 @@ public class MenuActivity extends AppCompatActivity{
         }
 
         setTitle("Hovedaktivitet");
-        // Man kan trykke på app-ikonet i øverste venstre hjørne
-        // (og det betyder at brugeren vil navigere op i hierakiet)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -41,8 +45,6 @@ public class MenuActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    public void Update() {
-        // Write your logic here.
-    }
+
 
 }

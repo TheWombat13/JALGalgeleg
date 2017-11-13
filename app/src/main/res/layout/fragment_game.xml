@@ -65,14 +65,15 @@
         app:layout_constraintTop_toBottomOf="@+id/info" />
 
     <TextView
-        android:key="mytime"
         android:id="@+id/timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
+        android:layout_marginTop="48dp"
+        android:key="mytime"
         android:text="Timer"
         android:textColor="@android:color/holo_green_light"
         app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_editor_absoluteY="48dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
