@@ -37,8 +37,8 @@ public class Win_Fragment extends Fragment implements View.OnClickListener {
 
 
 
- //       SharedPreferences preferences = this.getActivity().getSharedPreferences(MenuActivity.PREF_FILE_NAME, Context.MODE_PRIVATE);
- //       String wintime = preferences.getString("wintime", null);
+        SharedPreferences preferences = this.getActivity().getSharedPreferences(MenuActivity.PREF_FILE_NAME, Context.MODE_PRIVATE);
+        String wintime = preferences.getString("wintime", null);
 
 
         //     int seconds = preferences.getInt("seconds", 0);
@@ -47,7 +47,7 @@ public class Win_Fragment extends Fragment implements View.OnClickListener {
 
         timemessage = (TextView) rod.findViewById(R.id.winmessage);
 
-   //     timemessage.setText("Tillykke, du har vundet! din tid er : "+ wintime);
+        timemessage.setText("Tillykke, du har vundet! din tid er : "+ wintime);
 
 
 

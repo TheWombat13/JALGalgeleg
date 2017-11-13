@@ -3,7 +3,6 @@ package com.example.jonathanlarsen.jalgalgeleg;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,14 +48,10 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
 
         image = (ImageView)rod.findViewById(R.id.hanging);
 
-
-
         timecounter();
 
         return rod;
     }
-
-
 
     @Override
     public void onClick(View view) {
@@ -148,10 +143,12 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
                     .addToBackStack(null)
                     .commit();
            stopRecording();
+           MenuActivity.logik.nulstil();
 
         }
         if (MenuActivity.logik.erSpilletTabt()) {
             stopRecording();
+            MenuActivity.logik.nulstil();
             getFragmentManager().beginTransaction()
                     .replace(R.id.fragPlaceholder, new Lose_Fragment())
                     .addToBackStack(null)
@@ -159,12 +156,10 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
         }
 
 
-
-
         }
 
         public void updateHighscore() {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences preferences = this.getActivity().getSharedPreferences(MenuActivity.PREF_FILE_NAME, Context.MODE_PRIVATE);
             SharedPreferences.Editor prefsEditor = preferences.edit();
             prefsEditor.putInt("highscore_size", highscoreList.size());
 
@@ -175,17 +170,15 @@ public class Game_Fragment extends Fragment implements View.OnClickListener {
             }
 
             prefsEditor.apply();
-            //reset sharedPreferences
-            //prefsEditor.clear().commit();
     }
 
         public void getArray() {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences preferences = this.getActivity().getSharedPreferences(MenuActivity.PREF_FILE_NAME, Context.MODE_PRIVATE);
             highscoreList.clear();
-            int highscoreSize = sharedPreferences.getInt("highscore_size", 0);
+            int highscoreSize = preferences.getInt("highscore_size", 0);
 
             for (int i = 0; i < highscoreSize; i++) {
-                highscoreList.add(sharedPreferences.getString("highscore_" + i, null));
+                highscoreList.add(preferences.getString("highscore_" + i, null));
             }
         }
 }
